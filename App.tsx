@@ -12,21 +12,45 @@ const App = () => {
 
   const handleLogin = (employeeNumber, password, debug) => {
     setLoading(true);
-    // Simulate a login process
-    setTimeout(() => {
-      setLoading(false);
-      setIsAuthenticated(true);
-      setDebugMode(debug);
-    }, 3000);
+
+    // Send login request
+    axios
+      .post(
+        '/api/login',
+        {
+          employeeNumber,
+          password,
+        },
+        {
+          headers: { 'X-API-KEY': 'your-api-key' },
+        }
+      )
+      .then((response) => {
+        if (response.status === 200) {
+          setLoading(false);
+          setIsAuthenticated(true);
+          setDebugMode(debug);
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        // Handle error
+      });
   };
 
   return (
     <Container>
       {loading && <Loader />}
       {!isAuthenticated && (
-        <Login isAuthenticated={isAuthenticated} loginHandler={handleLogin} debugMode={debugMode} />
+        <Login
+          isAuthenticated={isAuthenticated}
+          loginHandler={handleLogin}
+          debugMode={debugMode}
+        />
       )}
-      {isAuthenticated && <Dashboard isAuthenticated={isAuthenticated} debugMode={debugMode} />}
+      {isAuthenticated && (
+        <Dashboard isAuthenticated={isAuthenticated} debugMode={debugMode} />
+      )}
     </Container>
   );
 };
