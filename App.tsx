@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Login from './Pages/Login';
 import Dashboard from './Pages/Dashboard';
 import Loader from './Pages/Loader';
+import axios from 'axios';
 import './style.css';
 
 const App = () => {
