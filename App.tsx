@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Login from './Pages/Login';
 import Dashboard from './Pages/Dashboard';
 import Loader from './Pages/Loader';
-import './style.css'
+import './style.css';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

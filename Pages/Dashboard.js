@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { BiSpeedometer2 } from 'react-icons/bi';
+import {
+  Speedometer2,
+  CardChecklist,
+  Calendar2DayFill,
+} from 'react-bootstrap-icons';
 
 const Container = styled.div`
   border-radius: 1em;
@@ -39,13 +43,36 @@ const ListItem = styled.li`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
+  background: ${(props) => (props.selected ? 'rgb(253,65,60)' : '')};
+  background: ${(props) =>
+    props.selected
+      ? 'linear-gradient(90deg, rgba(253,65,60,0.25) 0%, rgba(43,47,51,1) 80%, rgba(43,47,51,1) 100%)'
+      : ''};
+  border-right: ${(props) => (props.selected ? '3px solid #fd413c' : '')};
+  :hover{
+    background: linear-gradient(90deg, rgba(253,65,60,0.25) 0%, rgba(43,47,51,1) 80%, rgba(43,47,51,1) 100%);
+    color: #FD413C;
+  }
 `;
 
-const Label = styled.label`
+const Hidebutton = styled.label`
   width: 100%;
   height: 3em;
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  :hover{
+    background-color: #3d434b;
+  }
+`;
+
+const Label = styled.label`
+  width: 50%;
+  height: 3em;
+  display: ${(props) => (props.hide ? 'none' : 'flex')};
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -63,12 +90,12 @@ const Dashboard = () => {
   const [selected, setSelected] = useState(null);
   const [hide, setHide] = useState(false);
 
-  const handleSelect = (id) => {
-    setSelected(id);
-  };
-
   const handleHide = () => {
     setHide(!hide);
+  };
+
+  const handleSelect = (name) => {
+    setSelected(name);
   };
 
   return (
@@ -79,13 +106,36 @@ const Dashboard = () => {
       >
         <NavList>
           <ListItem>
-            <Label onClick={handleHide}>...</Label>
+            <Hidebutton onClick={handleHide}>...</Hidebutton>
           </ListItem>
-          <ListItem onClick={() => handleSelect('dashboard')}>
-            <Label>
-              <Name hide={hide}>DASHBOARD</Name>
+          <ListItem
+            selected={selected === 'dashboard'}
+            onClick={() => handleSelect('dashboard')}
+          >
+            <Speedometer2 size={25} />
+            <Label hide={hide}>
+              <Name>DASHBOARD</Name>
             </Label>
           </ListItem>
+          <ListItem
+            selected={selected === 'tasks'}
+            onClick={() => handleSelect('tasks')}
+          >
+            <CardChecklist size={25} />
+            <Label hide={hide}>
+              <Name>TASKS</Name>
+            </Label>
+          </ListItem>
+          <ListItem
+            selected={selected === 'calendar'}
+            onClick={() => handleSelect('calendar')}
+          >
+            <Calendar2DayFill size={25} />
+            <Label hide={hide}>
+              <Name>CALENDAR</Name>
+            </Label>
+          </ListItem>
+
           {/* Similar code for other list items */}
         </NavList>
       </Nav>
