@@ -1,28 +1,36 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
 import Loader from './Loader';
 
-const LoginWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+const Container = styled.div`
+  border-radius: 1em;
+  width: 85%;
   height: 100vh;
+  background-color: #212529;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
-const Form = styled.form`
+const Form = styled(motion.form)`
   display: flex;
   flex-direction: column;
   align-items: center;
   z-index: 1;
+  background-color: #2B2F33;
+  padding: 3em;
+  border-radius: 1em;
 `;
 
 const Input = styled.input`
   padding: 10px;
   margin: 10px;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: none;
   width: 300px;
+  background-color: #3d434b;
+  color: white;
 `;
 
 const Button = styled.button`
@@ -36,20 +44,7 @@ const Button = styled.button`
   font-size: 16px;
   margin: 10px;
   cursor: pointer;
-`;
-
-const ToggleWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 10px;
-`;
-
-const ToggleLabel = styled.span`
-  margin-right: 10px;
-`;
-
-const ToggleInput = styled.input`
-  margin-right: 10px;
+  border-radius: 5px;
 `;
 
 const Login = ({ isAuthenticated, loginHandler, debugMode, isLoading }) => {
@@ -69,14 +64,15 @@ const Login = ({ isAuthenticated, loginHandler, debugMode, isLoading }) => {
     loginHandler(employeeNumber, password, debugMode);
   };
 
-  const handleToggleDebugMode = () => {
-    loginHandler(employeeNumber, password, !debugMode);
-  };
-
   return (
-    <LoginWrapper>
+    <Container>
       {isLoading && <Loader />}
-      <Form onSubmit={handleSubmit}>
+      <Form
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -50 }}
+        transition={{ duration: 0.5 }}
+      >
         <Input
           type="text"
           placeholder="Employee Number"
@@ -91,11 +87,7 @@ const Login = ({ isAuthenticated, loginHandler, debugMode, isLoading }) => {
         />
         <Button type="submit">Login</Button>
       </Form>
-      <ToggleWrapper>
-        <ToggleLabel>Debug Mode:</ToggleLabel>
-        <ToggleInput type="checkbox" checked={debugMode} onChange={handleToggleDebugMode} />
-      </ToggleWrapper>
-    </LoginWrapper>
+    </Container>
   );
 };
 

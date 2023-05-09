@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Speedometer2,
   CardChecklist,
@@ -69,10 +69,10 @@ const Hidebutton = styled.label`
   }
 `;
 
-const Label = styled.label`
+const Label = styled(motion.label)`
   width: 50%;
   height: 3em;
-  display: ${(props) => (props.hide ? 'none' : 'flex')};
+  display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -113,29 +113,56 @@ const Dashboard = () => {
             onClick={() => handleSelect('dashboard')}
           >
             <Speedometer2 size={25} />
-            <Label hide={hide}>
-              <Name>DASHBOARD</Name>
-            </Label>
+            <AnimatePresence>
+              {!hide && (
+                <Label
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Name>DASHBOARD</Name>
+                </Label>
+              )}
+            </AnimatePresence>
           </ListItem>
           <ListItem
             selected={selected === 'tasks'}
             onClick={() => handleSelect('tasks')}
           >
             <CardChecklist size={25} />
-            <Label hide={hide}>
-              <Name>TASKS</Name>
-            </Label>
+            <AnimatePresence>
+              {!hide && (
+                <Label
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Name>TASKS</Name>
+                </Label>
+              )}
+            </AnimatePresence>
           </ListItem>
           <ListItem
             selected={selected === 'calendar'}
             onClick={() => handleSelect('calendar')}
           >
             <Calendar2DayFill size={25} />
-            <Label hide={hide}>
-              <Name>CALENDAR</Name>
-            </Label>
+            <AnimatePresence>
+              {!hide && (
+                <Label
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Name>CALENDAR</Name>
+                </Label>
+              )}
+            </AnimatePresence>
           </ListItem>
-
+  
           {/* Similar code for other list items */}
         </NavList>
       </Nav>
