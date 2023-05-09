@@ -1,82 +1,96 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import ClockInOut from './ClockInOut';
-import Loader from './Loader';
+import { BiSpeedometer2 } from 'react-icons/bi';
+
+const Container = styled.div`
+  border-radius: 1em;
+  width: 85%;
+  background-color: #212529;
+`;
+
+const Nav = styled(motion.nav)`
+  max-width: 15em;
+  height: 35em;
+  user-select: none;
+  font-size: 1em;
+  font-weight: bold;
+  background-color: #2B2F33;
+  border-top-left-radius: 1em;
+  border-bottom-left-radius: 1em;
+  color: #8B8E90;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+`;
+
+const NavList = styled.ul`
+  width: 100%;
+  height: 25em;
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const ListItem = styled.li`
+  height: 3em;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+`;
+
+const Label = styled.label`
+  width: 100%;
+  height: 3em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+const Name = styled.span`
+  width: 7em;
+  margin-left: 1em;
+  font-size: 0.8em;
+  display: ${(props) => (props.hide ? 'none' : 'inline')};
+`;
 
 const Dashboard = () => {
-  const [hours, setHours] = useState({
-    march: 200,
-    april: 150,
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [hide, setHide] = useState(false);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.5 } },
+  const handleSelect = (id) => {
+    setSelected(id);
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: -50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-
-  const handleClockInOut = () => {
-    setIsLoading(true);
-    // Simulating an API request
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+  const handleHide = () => {
+    setHide(!hide);
   };
 
   return (
-    <Container variants={containerVariants} initial="hidden" animate="visible">
-      <Header variants={itemVariants}>Dashboard</Header>
-      <Content>
-        <Row variants={itemVariants}>
-          <Title>March</Title>
-          <Hours>{hours.march}</Hours>
-        </Row>
-        <Row variants={itemVariants}>
-          <Title>April</Title>
-          <Hours>{hours.april}</Hours>
-        </Row>
-      </Content>
-      <ClockInOut handleClockInOut={handleClockInOut} />
-      {isLoading && <Loader />}
+    <Container>
+      <Nav
+        animate={{ width: hide ? '3em' : '15em' }}
+        transition={{ duration: 1.2 }}
+      >
+        <NavList>
+          <ListItem>
+            <Label onClick={handleHide}>...</Label>
+          </ListItem>
+          <ListItem onClick={() => handleSelect('dashboard')}>
+            <Label>
+              <Name hide={hide}>DASHBOARD</Name>
+            </Label>
+          </ListItem>
+          {/* Similar code for other list items */}
+        </NavList>
+      </Nav>
     </Container>
   );
 };
-
-const Container = styled(motion.div)`
-  max-width: 800px;
-  margin: 0 auto;
-`;
-
-const Header = styled(motion.h1)`
-  font-size: 32px;
-  margin-bottom: 20px;
-`;
-
-const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Row = styled(motion.div)`
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  margin-bottom: 10px;
-  background-color: #f5f5f5;
-`;
-
-const Title = styled.span`
-  font-size: 20px;
-`;
-
-const Hours = styled.span`
-  font-size: 20px;
-`;
 
 export default Dashboard;
