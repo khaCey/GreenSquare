@@ -1,23 +1,28 @@
 import React, { useState, useContext, useEffect } from 'react';
-import styled from 'styled-components';
-import Login from './Pages/Login';
-import DisplayPage from './Pages/DisplayPage';
-import Loader from './Pages/Loader';
-import axios from 'axios';
-import './style.css';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import styled from 'styled-components';
+import axios from 'axios';
+
 import { useSession } from './hooks/useSession'; // import the hook
 import { EmployeeDataContext } from './contexts/EmployeeDataContext'; // import the context
+
+import Login from './Pages/Login';
+import LandingPage from './Pages/LandingPage';
+import Loader from './Pages/Loader';
+
+import './style.css';
+
 
 const loadingTime = 1500;
 
 const App = () => {
   const [employeeData, setEmployeeData] = useContext(EmployeeDataContext);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [debugMode, setDebugMode] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { startSession, endSession } = useSession(30 * 60 * 1000, setIsAuthenticated); // use the hook
+  const { startSession, endSession } = useSession(30 * 60 * 1000, setIsAuthenticated, setEmployeeData, employeeData, isAuthenticated);
 
   useEffect(() => {
     const storedEmployeeData = localStorage.getItem('employeeData');
@@ -35,57 +40,55 @@ const App = () => {
     }, loadingTime);
   };
 
-  const handleLogin = (employeeID, password, debug) => {
+  const handleLogin = (employeeID, password) => {
     setLoading(true);
-    if (debug) {
-      setTimeout(() => {
-        setIsAuthenticated(true);
-        setDebugMode(debug);
-        setLoading(false);
-        startSession(); // start the session when logging in
-      }, loadingTime);
-    } else {
-      axios
-        .post(
-          `http://localhost:8080/api/v1/employee/login`,
-          {
-            id: employeeID,
-            password: password,
-          },
-          {
-            headers: { 'x-api-key': '34be70f8-aef9-47bd-8f8a-674503d24e73' },
-          }
-        )
-        .then((response) => {
-          if (response.status === 200) {
-            // Fetch employee data after successful login
-            axios
-              .get(`http://localhost:8080/api/v1/employee/${employeeID}`, {
-                headers: { 'x-api-key': '34be70f8-aef9-47bd-8f8a-674503d24e73' },
-              })
-              .then((response) => {
-                const employeeData = response.data;
-                setEmployeeData(employeeData); // Save the employee data
-                localStorage.setItem('employeeData', JSON.stringify(employeeData)); // Store employee data in localStorage
-                setTimeout(() => {
-                  setIsAuthenticated(true);
-                  setDebugMode(debug);
-                  setLoading(false);
-                  startSession(); // start the session when logging in
-                }, loadingTime);
-              })
-              .catch((error) => {
-                console.error('Error fetching employee data: ', error);
+    console.log(process.env.REACT_APP_API_URL);
+    console.log(process.env.REACT_APP_API_KEY);
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}employee/login`,
+        {
+          id: employeeID,
+          password: password,
+        },
+        {
+          headers: { 'x-api-key': process.env.REACT_APP_API_KEY },
+        }
+      )
+      .then((response) => {
+    
+        if (response.data.success) {  // check if the login was successful
+          // Fetch employee data after successful login
+          axios
+            .get(`${process.env.REACT_APP_API_URL}employee/${employeeID}`, {
+              headers: { 'x-api-key': process.env.REACT_APP_API_KEY },
+            })
+            .then((response) => {
+              const employeeData = response.data;
+              setEmployeeData(employeeData); // Save the employee data
+              localStorage.setItem('employeeData', JSON.stringify(employeeData)); // Store employee data in localStorage
+              setTimeout(() => {
+                setIsAuthenticated(true);
                 setLoading(false);
-              });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          setLoading(false);
-        });
-    }
+                startSession(); // start the session when logging in
+              }, loadingTime);
+            })
+            .catch((error) => {
+              console.error('Error fetching employee data: ', error);
+              setLoading(false);
+              toast.error('Error fetching employee data. Please try again later.');
+            });
+        } else {
+          throw new Error('Login unsuccessful. Please check your credentials and try again.'); 
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+        toast.error('Login unsuccessful. Please check your credentials and try again.');
+      });
   };
+  
 
   return (
     <Router>
@@ -95,11 +98,10 @@ const App = () => {
           <Login
             isAuthenticated={isAuthenticated}
             loginHandler={handleLogin}
-            debugMode={debugMode}
           />
         )}
         {isAuthenticated && (
-          <DisplayPage 
+          <LandingPage 
             logoutHandler={handleLogout} 
             employeeData={employeeData}  // Pass the employee data as a prop
           />

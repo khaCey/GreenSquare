@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-export const useSession = (sessionLength, setIsAuthenticated) => {
+export const useSession = (sessionLength, setIsAuthenticated, setEmployeeData, employeeData, isAuthenticated) => {
   const [lastActivity, setLastActivity] = useState(Date.now());
   
   const startSession = useCallback(() => {
@@ -11,7 +11,8 @@ export const useSession = (sessionLength, setIsAuthenticated) => {
   const endSession = useCallback(() => {
     localStorage.removeItem('isAuthenticated');
     setIsAuthenticated(false);
-  }, [setIsAuthenticated]);
+    setEmployeeData(null); // clear the employeeData
+  }, [setIsAuthenticated, setEmployeeData]);
 
   const maintainSession = useCallback(() => {
     setLastActivity(Date.now());
@@ -26,10 +27,10 @@ export const useSession = (sessionLength, setIsAuthenticated) => {
     }
   }, [setIsAuthenticated, startSession]);
 
-  // Original useEffect for checking session timeout and maintaining the session
+  // Modified useEffect for checking session timeout and maintaining the session
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (Date.now() > lastActivity + sessionLength) {
+      if ((Date.now() > lastActivity + sessionLength || !employeeData) && isAuthenticated) {
         alert("Session timed out.");
         endSession();
       }
@@ -50,7 +51,7 @@ export const useSession = (sessionLength, setIsAuthenticated) => {
       window.removeEventListener('touchmove', maintainSession);
       window.removeEventListener('scroll', maintainSession);
     };
-  }, [maintainSession, endSession, lastActivity, sessionLength]);
+  }, [maintainSession, endSession, lastActivity, sessionLength, employeeData, isAuthenticated]);
 
   return { startSession, endSession };
 };

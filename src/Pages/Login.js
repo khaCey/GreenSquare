@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Loader from './Loader';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginWrapper = styled.div`
   display: flex;
@@ -47,81 +48,50 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-const ToggleWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 10px;
-`;
-
-const ToggleLabel = styled.span`
-  margin-right: 10px;
-`;
-
-const ToggleInput = styled.input`
-  margin-right: 10px;
-`;
-
-const API_KEY = '34be70f8-aef9-47bd-8f8a-674503d24e73'; // Replace with your actual API key
-
-const Login = ({loginHandler, debugMode, isLoading }) => {
-  const [employeeNumber, setEmployeeNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
-
-  const handleEmployeeNumberChange = (e) => {
-    console.log(e.target.value);
-    setEmployeeNumber(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
+const Login = ({ loginHandler, isLoading }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      loginHandler(employeeNumber, password, debugMode);
-    } catch (error) {
-      // handle error
-      console.log(error);
+    const employeeID = e.target.elements.employeeID.value;
+    const password = e.target.elements.password.value;
+    
+    console.log(employeeID);
+    if (!employeeID || !password) {
+      toast.error('Employee number and password are required.');
+      return;
     }
-  };
-
-  const handleToggleDebugMode = () => {
-    loginHandler(employeeNumber, password, !debugMode);
+  
+    try {
+      await loginHandler(employeeID, password);
+    } catch (error) {
+      console.log(error);
+      toast.error('Login unsuccessful. Please check your credentials and try again.');
+    }
   };
   
   useEffect(() => {
-    document.title = "Green Square - Login";
+    document.title = 'Green Square - Login';
   }, []);
 
   return (
     <LoginWrapper>
+      <ToastContainer />
       {isLoading && <Loader />}
       <Form onSubmit={handleSubmit}>
         <Input
+          name="employeeID"
           type="text"
           placeholder="Employee Name / Number"
-          value={employeeNumber}
-          onChange={handleEmployeeNumberChange}
         />
         <Input
+          name="password"
           type="password"
           placeholder="Password"
-          value={password}
-          onChange={handlePasswordChange}
         />
         <Button type="submit">Login</Button>
       </Form>
-      <ToggleWrapper>
-        <ToggleLabel>Debug Mode:</ToggleLabel>
-        <ToggleInput
-          type="checkbox"
-          checked={debugMode}
-          onChange={handleToggleDebugMode}
-        />
-      </ToggleWrapper>
     </LoginWrapper>
   );
+  
 };
+
 export default Login;

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { ClockFill } from 'react-bootstrap-icons';
 import Modal from 'react-modal';
 
-Modal.setAppElement('#root');  // This line is necessary for accessibility reasons
+Modal.setAppElement('#root');
 
 const ClockInWrapper = styled.div`
 `;
@@ -18,7 +18,7 @@ const Button = styled(motion.button)`
   background-color: #4CAF50;
   margin-right: 1em;
   width: 9em;
-  height: 2em;
+  height: 100%;
   border: none;
   color: white;
   border-radius: 0.25em;
@@ -31,7 +31,6 @@ const Button = styled(motion.button)`
 `;
 
 const Text = styled.div`
-  
 `;
 
 const ClockOutButton = styled(Button)`
@@ -39,36 +38,47 @@ const ClockOutButton = styled(Button)`
 `;
 
 const ClockIn = ({ employeeID }) => {
-  const [clockedIn, setClockedIn] = useState(false);
+  const [clockedIn, setClockedIn] = useState(null);
 
-  const handleClockInOut = () => {
-    // Define the endpoint
-    console.log(employeeID);
-    const endpoint = `http://localhost:8080/api/v1/records`;
+  const fetchLatestRecord = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}records/latest/${employeeID}`,
+        {
+          headers: { 'x-api-key': process.env.REACT_APP_API_KEY },
+        }
+      );
+      const latestRecord = response.data[0];
+      setClockedIn(latestRecord && latestRecord.type === 'clock-in');
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    // Define the action type based on the current clockedIn state
-    const actionType = clockedIn ? 'clock-out' : 'clock-in';
+  useEffect(() => {
+    fetchLatestRecord();
+  }, []);
 
-    // Send POST request with the appropriate data
-    axios
-      .post(endpoint, 
+  const handleClockInOut = async () => {
+    try {
+      const actionType = clockedIn ? 'clock-out' : 'clock-in';
+  
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}records`,
         {
           employeeID: employeeID,
-          time: new Date(), // using the current date for demonstration purposes
+          time: new Date().toUTCString(),
           type: actionType,
         },
         {
-          headers: { 'x-api-key': '34be70f8-aef9-47bd-8f8a-674503d24e73' }
+          headers: { 'x-api-key': process.env.REACT_APP_API_KEY },
         }
-      )
-      .then((response) => {
-        console.log(response);
-        // Flip the clockedIn state only after successful response
-        setClockedIn(!clockedIn);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      );
+      
+      fetchLatestRecord();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const buttonVariants = {

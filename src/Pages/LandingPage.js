@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import DashboardPage from '../Components/DashboardPage';
+import EmployeePage from '../Components/EmployeePage';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Speedometer2,
@@ -9,6 +10,7 @@ import {
   BoxArrowLeft,
   ListUl,
   ThreeDotsVertical,
+  PeopleFill,
 } from 'react-bootstrap-icons';
 
 const Container = styled.div`
@@ -109,10 +111,9 @@ const Name = styled.span`
   display: ${(props) => (props.hide ? 'none' : 'inline')};
 `;
 
-const DisplayPage = ({ logoutHandler,employeeID, employeeData }) => {
+const LandingPage = ({ logoutHandler, employeeData }) => {
   const [selected, setSelected] = useState('dashboard');
   const [hide, setHide] = useState(false);
-
   const handleHide = () => {
     setHide(!hide);
   };
@@ -195,6 +196,27 @@ const DisplayPage = ({ logoutHandler,employeeID, employeeData }) => {
                 )}
               </AnimatePresence>
             </ListItem>
+            {employeeData[0].privileges === 'admin' && (
+              <ListItem
+                className="default"
+                selected={selected === 'employees'}
+                onClick={() => handleSelect('employees')}
+              >
+                <PeopleFill size={25} />
+                <AnimatePresence>
+                  {!hide && (
+                    <Label
+                      initial={{ opacity: 0, x: -50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -50 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Name>EMPLOYEES</Name>
+                    </Label>
+                  )}
+                </AnimatePresence>
+              </ListItem>
+            )}
           </NavContainer>
           <ListItem className="logout" onClick={handleLogout}>
             <BoxArrowLeft size={25} />
@@ -215,10 +237,11 @@ const DisplayPage = ({ logoutHandler,employeeID, employeeData }) => {
         </NavList>
       </Nav>
       <PageContainer>
-        {selected === 'dashboard' && <DashboardPage employeeID={employeeID} employeeData={employeeData}/>}
+        {selected === 'dashboard' && <DashboardPage employeeData={employeeData} />}
+        {selected === 'employees' && <EmployeePage employeeData={employeeData} />}
       </PageContainer>
     </Container>
   );
 };
 
-export default DisplayPage;
+export default LandingPage;

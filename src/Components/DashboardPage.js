@@ -16,7 +16,9 @@ const DashboardContainer = styled.div`
 `;
 
 const UpperContainer = styled.div`
-    height: 5em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    height: 2em;
     width: 100%;
     display: flex;
     align-items: center;
@@ -30,6 +32,7 @@ const BottomContainer = styled.div`
     display: flex;
     margin-bottom: 1em;
 `;
+
 const PageName = styled.div`
     margin-left: 1em;
 `;
@@ -52,14 +55,13 @@ const DashboardPage = ({ employeeID, employeeData }) => {
     useEffect(() => {
         document.title = "Green Square - Dashboard";
     }, []);
-    
     return (
         <DashboardContainer>
             <UpperContainer>
                 <PageName>
                     <h1>Dashboard</h1>
                 </PageName>
-                <Clock employeeID={employeeID}/>
+                <Clock employeeID={employeeData[0].employeeID}/>
             </UpperContainer>
             <BottomContainer>
                 <Container>    
@@ -67,7 +69,7 @@ const DashboardPage = ({ employeeID, employeeData }) => {
                     <Revenue/>
                     <ToDoListComponent/>
                 </Container>
-                <ProfileBanner employeeID={employeeID} employeeData={employeeData}/>
+                <ProfileBanner employeeData={employeeData}/>
             </BottomContainer>
         </DashboardContainer>
     );
