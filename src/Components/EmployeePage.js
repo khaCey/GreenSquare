@@ -15,7 +15,7 @@ const EmployeePageContainer = styled.div`
 `;
 
 const EmployeeCard = styled.div`
-  position: relative; // New line
+  position: relative;
   background: #f8f9fa;
   border-radius: 1em;
   padding: 1em;
@@ -27,11 +27,11 @@ const EmployeeCard = styled.div`
 `;
 
 const EmployeeHeader = styled.div`
-  position: sticky; // New line
-  top: 0; // New line
+  position: sticky; 
+  top: 0;
   background-color: #2B2F33;
-  padding: 5px 0; // New line
-  z-index: 1; // New line
+  padding: 5px 0;
+  z-index: 1;
 `;
 
 const EmployeeName = styled.h3`
@@ -81,15 +81,14 @@ const SideBanner = styled.div`
 
 const BottomContainer = styled.div`
   flex-grow: 1;
+  height: 93vh;
   width: 100%;
   margin-bottom: 1em;
   display: flex;
-  overflow: hidden;
 `;
 
 const EmployeeList = styled.div`
   width: 100%;
-  outline: 1px solid white;
   overflow-x: auto;
   
   /* Custom Scrollbar */
@@ -98,16 +97,18 @@ const EmployeeList = styled.div`
   }
 
   ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #888;
+    background: #555;
     border-radius: 5px;
   }
 
+  ::-webkit-scrollbar-thumb {
+    background: rgba(253,65,60,0.75);
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
   ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: rgba(253,65,60,0.50);
   }
 `;
 

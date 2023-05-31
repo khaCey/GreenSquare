@@ -11,6 +11,7 @@ import {
   ListUl,
   ThreeDotsVertical,
   PeopleFill,
+  PersonBadgeFill
 } from 'react-bootstrap-icons';
 
 const Container = styled.div`
@@ -196,26 +197,48 @@ const LandingPage = ({ logoutHandler, employeeData }) => {
                 )}
               </AnimatePresence>
             </ListItem>
+            <ListItem
+              className="default"
+              selected={selected === 'students'}
+              onClick={() => handleSelect('students')}
+            >
+              <PersonBadgeFill size={25} />
+              <AnimatePresence>
+                {!hide && (
+                  <Label
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Name>STUDENTS</Name>
+                  </Label>
+                )}
+              </AnimatePresence>
+            </ListItem>
             {employeeData[0].privileges === 'admin' && (
-              <ListItem
-                className="default"
-                selected={selected === 'employees'}
-                onClick={() => handleSelect('employees')}
-              >
-                <PeopleFill size={25} />
-                <AnimatePresence>
-                  {!hide && (
-                    <Label
-                      initial={{ opacity: 0, x: -50 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -50 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <Name>EMPLOYEES</Name>
-                    </Label>
-                  )}
-                </AnimatePresence>
-              </ListItem>
+              <>
+                <ListItem
+                  className="default"
+                  selected={selected === 'employees'}
+                  onClick={() => handleSelect('employees')}
+                >
+                  <PeopleFill size={25} />
+                  <AnimatePresence>
+                    {!hide && (
+                      <Label
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -50 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <Name>EMPLOYEES</Name>
+                      </Label>
+                    )}
+                  </AnimatePresence>
+                </ListItem>
+              </>
+              
             )}
           </NavContainer>
           <ListItem className="logout" onClick={handleLogout}>
@@ -239,6 +262,7 @@ const LandingPage = ({ logoutHandler, employeeData }) => {
       <PageContainer>
         {selected === 'dashboard' && <DashboardPage employeeData={employeeData} />}
         {selected === 'employees' && <EmployeePage employeeData={employeeData} />}
+        {selected === 'students' && <StudentPage />}
       </PageContainer>
     </Container>
   );
