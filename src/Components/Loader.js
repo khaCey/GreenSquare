@@ -11,12 +11,13 @@ const spin = keyframes`
 `;
 
 const LoaderWrapper = styled.div`
+  outline: 1px solid white;
   position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   z-index: 2;
 `;
 

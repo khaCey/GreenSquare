@@ -1,263 +1,196 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import styled from 'styled-components';
+import { EmployeePageContainer, UpperContainer, PageName, BottomContainer, InnerBottomContainer, EmployeeList, EmployeeCard as EmployeeCardLabel, EmployeeHeader, EmployeeName, EmployeeNumber, EmployeeDays, EmployeeHours, Modal, Overlay } from './StyledComponents'; // import the relevant styled components
+import { EmployeeCard } from './EmployeeCard';
+import { AddEmployeeButton } from './EmployeeAddEmployeeButton';
+import { RecordCard } from './EmployeeRecordCard';
+import { ShiftCard } from './EmployeeShiftCard';
+import { LoadingSpinner } from './LoadingSpinner';
 import { ToastContainer, toast } from 'react-toastify';
-import { PencilFill, XCircleFill, CheckCircleFill } from 'react-bootstrap-icons';
 import 'react-toastify/dist/ReactToastify.css';
 
-const EmployeePageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-`;
-
-const EmployeeCard = styled.div`
-  position: relative;
-  background: #f8f9fa;
-  border-radius: 1em;
-  padding: 1em;
-  margin-bottom: 1em;
-  margin-right: 1em;
-  margin-left: 1em;
-  flex-grow: 1;
-  background-color: #2B2F33;
-`;
-
-const EmployeeHeader = styled.div`
-  position: sticky; 
-  top: 0;
-  background-color: #2B2F33;
-  padding: 5px 0;
-  z-index: 1;
-`;
-
-const EmployeeName = styled.h3`
-  color: white;
-`;
-
-const DateEntry = styled.p`
-`;
-
-const TimeEntry = styled.p`
-`;
-
-const List = styled.ul`
-  list-style-type: none;
-`;
-
-const ListItem = styled.li`
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-`;
-
-const UpperContainer = styled.div`
-  margin-top: 1em;
-  margin-bottom: 1em;
-  height: 2em;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: white;
-`;
-
-const PageName = styled.div`
-  margin-left: 1em;
-`;
-
-const SideBanner = styled.div`
-  background-color: #2B2F33;
-  height: 93vh;
-  color: #BDCDD6;
-  box-sizing: border-box;
-  padding: 1em;
-  margin-right: 1em;
-`;
-
-const BottomContainer = styled.div`
-  flex-grow: 1;
-  height: 93vh;
-  width: 100%;
-  margin-bottom: 1em;
-  display: flex;
-`;
-
-const EmployeeList = styled.div`
-  width: 100%;
-  overflow-x: auto;
-  
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #555;
-    border-radius: 5px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(253,65,60,0.75);
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(253,65,60,0.50);
-  }
-`;
-
-const Content = styled.div`
-    outline: 1px solid white;
-    width: 18vw;
-    height: 100%;
-`;
-
 const EmployeePage = ({ employeeData }) => {
-  const [employees, setEmployees] = useState([]);
-  const [records, setRecords] = useState([]);
-  const [editRecord, setEditRecord] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [employees, setEmployees] = useState([]);
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [employeeRecords, setEmployeeRecords] = useState(null);
+    const [records, setRecords] = useState([]);
+    const [shifts, setShifts] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const isAdmin = employeeData[0].privileges === 'admin';
+    const modalRef = useRef();
 
-  const isAdmin = employeeData[0].privileges === 'admin';
-
-  useEffect(() => {
-    if (isAdmin) {
-      let currentDate = new Date();
-      let startYear = currentDate.getUTCFullYear();
-      let startMonth = currentDate.getUTCMonth();
-      let endYear = currentDate.getUTCFullYear();
-      let endMonth = currentDate.getUTCMonth() + 1; // JavaScript months are 0-indexed
-
-      if (currentDate.getUTCDate() < 21) {
-        if (startMonth === 0) {
-          startMonth = 11;
-          startYear -= 1;
-        } else {
-          startMonth -= 1;
+    const calculateDaysWorked = (records) => {
+        if (!records) {
+            return 0;  // return a default value when no records
         }
-        endMonth -= 1;
-      }
-
-      let startDate = new Date(Date.UTC(startYear, startMonth, 21));
-      let endDate = new Date(Date.UTC(endYear, endMonth, 20, 23, 59, 59, 999));
-
-      axios.get(
-        `${process.env.REACT_APP_API_URL}employee/`,
-        { headers: { 'x-api-key': '34be70f8-aef9-47bd-8f8a-674503d24e73' }}
-      ).then((res) => {
-        setEmployees(res.data);
-        Promise.all(res.data.map(employee =>
-          axios.get(
-            `${process.env.REACT_APP_API_URL}records/${employeeData[0].employeeID}/${startDate.toISOString()}/${endDate.toISOString()}`,
-            { 
-              headers: { 'x-api-key': process.env.REACT_APP_API_KEY }
-            }
-          ).then(response => {
-            let records = response.data;
-
-            // If the first record's time is before the start date, remove it
-            if (records.length > 0 && new Date(records[0].time) < startDate) {
-              records = records.slice(1);
-            }
-
-            // Exclude the last record if its type is 'clockin'
-            if (records.length > 0 && records[records.length - 1].type === 'clockin') {
-              records.pop();
-            }
-
-            return records;
-          })
-        )).then(recordsResponses => {
-          // Map the records with the corresponding employee
-          const employeeRecords = res.data.reduce((obj, employee, index) => {
-            obj[employee.employeeID] = recordsResponses[index];
-            return obj;
-          }, {});
-          setRecords(employeeRecords);
-        });
-      });
-    }
-  }, [isAdmin, employeeData]);
-
-  if (!isAdmin) {
-    toast.error('You do not have the necessary permissions to view this page.');
-    return <ToastContainer />;
-  }
+        const daysWorked = new Set(records.map(record => (new Date(record.time)).toDateString()));
+        return daysWorked.size;
+    };
   
+    const calculateHoursWorked = (records) => {
+        if (!records) {
+            return 0;  // return a default value when no records
+        }
+        let totalHoursWorked = 0;
+        for (let i = 0; i < records.length; i += 2) {
+            const clockInTime = new Date(records[i].time);
+            const clockOutTime = new Date(records[i + 1]?.time);
+            if (clockOutTime) {
+                const hoursWorked = (clockOutTime - clockInTime) / (1000 * 60 * 60);
+                totalHoursWorked += hoursWorked;
+            }
+        }
+        return totalHoursWorked.toFixed(2);
+    };
+    
+    const handleSelect = (employee) => {
+        setSelectedEmployee(employee.employeeID);
+        setEmployeeRecords(records[employee.employeeID]);
+        setShowModal(true);
+    };
+
+    useEffect(() => {
+        if (employeeRecords) {
+            const groupedRecords = employeeRecords.reduce((acc, record) => {
+                const date = (new Date(record.time)).toDateString();
+                if (!acc[date]) acc[date] = [];
+                acc[date].push(record);
+                return acc;
+            }, {});
+
+            const sortedShifts = Object.values(groupedRecords).sort((a, b) => new Date(a[0].time) - new Date(b[0].time));
+            setShifts(sortedShifts);
+        }
+    }, [employeeRecords]);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                setShowModal(false);
+            }
+        }
+  
+        // Attach the listeners to the document
+        document.addEventListener("mousedown", handleClickOutside);
+    
+        return () => {
+            // Unbind the listener on component unmount
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+    
+    useEffect(() => {
+        if (isAdmin) {
+            setIsLoading(true);
+            let currentDate = new Date();
+            let startYear = currentDate.getUTCFullYear();
+            let startMonth = currentDate.getUTCMonth();
+            let endYear = currentDate.getUTCFullYear();
+            let endMonth = currentDate.getUTCMonth() + 1; // JavaScript months are 0-indexed
+        
+            if (currentDate.getUTCDate() < 21) {
+                if (startMonth === 0) {
+                    startMonth = 11;
+                    startYear -= 1;
+                } else {
+                    startMonth -= 1;
+                }
+                endMonth -= 1;
+            }
+  
+            let startDate = new Date(Date.UTC(startYear, startMonth, 21));
+            let endDate = new Date(Date.UTC(endYear, endMonth, 20, 23, 59, 59, 999));
+    
+            axios.get(
+                `${process.env.REACT_APP_API_URL}employee/`,
+                { headers: { 'x-api-key': '34be70f8-aef9-47bd-8f8a-674503d24e73' }}
+            ).then((res) => {
+                setEmployees(res.data);
+                Promise.all(res.data.map(employee =>
+                    axios.get(
+                        `${process.env.REACT_APP_API_URL}records/${employee.employeeID}/${startDate.toISOString()}/${endDate.toISOString()}`,
+                    { 
+                        headers: { 'x-api-key': process.env.REACT_APP_API_KEY }
+                    }
+                ).then(response => {
+                    let records = response.data.filter(record => !record.isDeleted);
+    
+                    // If the first record's time is before the start date, remove it
+                    if (records.length > 0 && new Date(records[0].time) < startDate) {
+                        records = records.slice(1);
+                    }
+    
+                    // Exclude the last record if its type is 'clockin'
+                    if (records.length > 0 && records[records.length - 1].type === 'clockin') {
+                        records.pop();
+                    }
+    
+                    return records;
+                })
+            )).then(recordsResponses => {
+                // Map the records with the corresponding employee
+                const employeeRecords = res.data.reduce((obj, employee, index) => {
+                    obj[employee.employeeID] = recordsResponses[index];
+                    return obj;
+                }, {});
+                setRecords(employeeRecords);
+                setIsLoading(false);
+            });
+            });
+        }
+    }, [isAdmin, employeeData]);
+    
+    if (!isAdmin) {
+        toast.error('You do not have the necessary permissions to view this page.');
+        return <ToastContainer />;
+    }
+    
   return (
-
     <EmployeePageContainer>
-      <UpperContainer>
-        <PageName>
-          <h1>Employees</h1>
-        </PageName>
-      </UpperContainer>
-      <BottomContainer>
-        <EmployeeList>
-          {employees.map((employee, index) => (
-            <EmployeeCard key={employee.employeeID}>
-              <EmployeeHeader>
-                <EmployeeName>{employee.firstName} {employee.lastName}</EmployeeName>
-              </EmployeeHeader>
-              <List>
-              {records[employee.employeeID] && records[employee.employeeID].map((record) => {
-                  const date = new Date(record.time);
-                  const formattedDate = `${date.getFullYear()}/${("0" + (date.getMonth() + 1)).slice(-2)}/${("0" + date.getDate()).slice(-2)}`;
-                  const formattedTime = date.toLocaleTimeString('en-US', { hour12: false });
-
-                  return (
-                    <ListItem key={record.id}>
-                      {editRecord === record ? (
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <input
-                            type="datetime-local"
-                            defaultValue={new Date(record.time).toISOString().substring(0,16)}
-                            onBlur={(event) => {
-                              // Here you'd usually call an API to update the record.
-                              // For now, just update it locally:
-                              record.time = event.target.value;
-                            }}
-                          />
-                          <CheckCircleFill 
-                            style={{ cursor: 'pointer', marginLeft: '10px' }}
-                            onClick={() => {
-                              // Here you'd usually call an API to save the record.
-                              // For now, just set the edit mode off:
-                              setEditRecord(null);
-                            }} 
-                          />
-                          <XCircleFill 
-                            style={{ cursor: 'pointer', marginLeft: '10px' }}
-                            onClick={() => setEditRecord(null)} 
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          <DateEntry>{formattedDate}</DateEntry>
-                          <TimeEntry>{formattedTime}</TimeEntry>
-                          <PencilFill style={{ cursor: 'pointer' }} onClick={() => setEditRecord(record)} />
-                        </>
-                      )}
-
-                    </ListItem>
-
-                  )
-                })}
-              </List>
-            </EmployeeCard>
-          ))}
-        </EmployeeList>
-        <SideBanner><Content/></SideBanner>
-      </BottomContainer>
       
-    </EmployeePageContainer>
+        <UpperContainer>
+            <PageName>
+                <h1>Employees</h1>
+            </PageName>
+        </UpperContainer>
 
-  );
+        <BottomContainer>
+            <InnerBottomContainer>
+                {isLoading && <LoadingSpinner />}
+                {isAdmin && <AddEmployeeButton showModal={setShowModal} />}
+                <EmployeeList>
+                    <EmployeeCardLabel className='label'>
+                        <EmployeeHeader>
+                            <EmployeeName> Name </EmployeeName>
+                            <EmployeeNumber> Employee Number </EmployeeNumber>
+                            <EmployeeDays> Days </EmployeeDays>
+                            <EmployeeHours> Hours </EmployeeHours>
+                        </EmployeeHeader>
+                    </EmployeeCardLabel>
+                    {employees.map((employee) => (
+                        <EmployeeCard 
+                            key={employee.employeeID}
+                            employee={employee} 
+                            handleSelect={handleSelect} 
+                            calculateDaysWorked={calculateDaysWorked} 
+                            calculateHoursWorked={calculateHoursWorked}    
+                            records={records[employee.employeeID]}
+                        />
+                    ))}
+                </EmployeeList>
+            </InnerBottomContainer>
+        </BottomContainer>
+        {showModal &&
+            <>
+                <Overlay/>
+                <Modal ref={modalRef}>
+                    <ShiftCard shifts={shifts} />
+                </Modal>
+            </>
+        }
+    </EmployeePageContainer>
+  );  
 };
 
 export default EmployeePage;

@@ -60,9 +60,12 @@ const ClockIn = ({ employeeID }) => {
   }, []);
 
   const handleClockInOut = async () => {
+    const actionType = clockedIn ? 'clock-out' : 'clock-in';
+
+    // Optimistically update state
+    setClockedIn(actionType === 'clock-in');
+
     try {
-      const actionType = clockedIn ? 'clock-out' : 'clock-in';
-  
       await axios.post(
         `${process.env.REACT_APP_API_URL}records`,
         {
@@ -74,10 +77,13 @@ const ClockIn = ({ employeeID }) => {
           headers: { 'x-api-key': process.env.REACT_APP_API_KEY },
         }
       );
-      
+    
+      // Fetch latest record to ensure state is in sync with the server
       fetchLatestRecord();
     } catch (error) {
       console.log(error);
+      // Revert state if there was an error
+      setClockedIn(clockedIn);
     }
   };
 

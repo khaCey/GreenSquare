@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import Loader from './Loader';
+import Loader from '../Components/Loader';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -54,7 +54,6 @@ const Login = ({ loginHandler, isLoading }) => {
     const employeeID = e.target.elements.employeeID.value;
     const password = e.target.elements.password.value;
     
-    console.log(employeeID);
     if (!employeeID || !password) {
       toast.error('Employee number and password are required.');
       return;

@@ -10,7 +10,7 @@ import { EmployeeDataContext } from './contexts/EmployeeDataContext'; // import 
 
 import Login from './Pages/Login';
 import LandingPage from './Pages/LandingPage';
-import Loader from './Pages/Loader';
+import Loader from './Components/Loader';
 
 import './style.css';
 
