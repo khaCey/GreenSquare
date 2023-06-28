@@ -1,54 +1,11 @@
 import React, { useEffect } from 'react';
 import ClockInOut from "./ClockInOut";
+import { DashboardContainer, DashboardUpperContainer as UpperContainer, DashboardBottomContainer as BottomContainer, PageName, DashboardInnerContainer as Container, } from './StyledComponents';
 import ProfileBanner from "./Profile";
 import Alerts from "./Alerts";
 import Revenue from "./Revenue";
 import ToDoListComponent from "./ToDoListComponent";
 import styled from "styled-components";
-
-const DashboardContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-`;
-
-const UpperContainer = styled.div`
-    margin-top: 1em;
-    margin-bottom: 1em;
-    height: 2em;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: white;
-`;
-
-const BottomContainer = styled.div`
-    flex-grow: 1;
-    width: 100%;
-    display: flex;
-    margin-bottom: 1em;
-`;
-
-const PageName = styled.div`
-    margin-left: 1em;
-`;
-
-const Container = styled.div`
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 93vh;
-    margin-right: 1em;
-    margin-left: 1em;
-`;
-
-const Clock = styled(ClockInOut)`
-`;
 
 const DashboardPage = ({ employeeID, employeeData }) => {
     
@@ -61,7 +18,7 @@ const DashboardPage = ({ employeeID, employeeData }) => {
                 <PageName>
                     <h1>Dashboard</h1>
                 </PageName>
-                <Clock employeeID={employeeData[0].employeeID}/>
+                <ClockInOut employeeID={employeeData[0].employeeID}/>
             </UpperContainer>
             <BottomContainer>
                 <Container>    

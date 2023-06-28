@@ -12,6 +12,16 @@ export const ShiftCard = ({ shifts }) => (
         {shifts.map((shift, index) => {
             // Calculate total break time for this shift
             let totalBreakTime = 0;
+            let clockInTime = '';
+            let clockOutTime = '';
+            for (let i = 0; i < shift.length; i++) {
+                if (shift[i].type === 'clock-in') {
+                    clockInTime = (new Date(shift[i].time)).toLocaleTimeString();
+                } else if (shift[i].type === 'clock-out') {
+                    clockOutTime = (new Date(shift[i].time)).toLocaleTimeString();
+                }
+            }
+
             for (let i = 2; i < shift.length; i += 2) {
                 const breakStart = new Date(shift[i - 1].time);
                 const breakEnd = new Date(shift[i].time);
@@ -22,11 +32,8 @@ export const ShiftCard = ({ shifts }) => (
             return (
                 <ShiftCardStyled key={index}>
                     <ShiftDate>{(new Date(shift[0].time)).toDateString()}</ShiftDate>
-                    {shift.map((record, idx) => (
-                        <ShiftClock key={idx}>
-                            <span>{(new Date(record.time)).toLocaleTimeString()}</span>
-                        </ShiftClock>
-                    ))}
+                    <ShiftClock>{clockInTime}</ShiftClock>
+                    <ShiftClock>{clockOutTime}</ShiftClock>
                     <ShiftBreak>
                         {totalBreakTime} hrs
                     </ShiftBreak>
@@ -35,3 +42,4 @@ export const ShiftCard = ({ shifts }) => (
         })}
     </ShiftCardContainer>
 );
+

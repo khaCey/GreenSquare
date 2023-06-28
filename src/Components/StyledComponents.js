@@ -100,10 +100,6 @@ export const UpperContainer = styled.div`
     color: white;
 `;
 
-export const PageName = styled.div`
-    margin-left: 1em; 
-`;
-
 export const BottomContainer = styled.div`
     flex-grow: 1;
     height: 93vh;
@@ -220,4 +216,45 @@ export const ShiftClock = styled.div`
 
 export const ShiftBreak = styled.div`
     width: 20em;
+`;
+
+export const DashboardContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+`;
+
+export const DashboardUpperContainer = styled.div`
+    margin-top: 1em;
+    margin-bottom: 1em;
+    height: 2em;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+`;
+
+export const DashboardBottomContainer = styled.div`
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    margin-bottom: 1em;
+`;
+
+export const PageName = styled.div`
+    margin-left: 1em;
+`;
+
+export const DashboardInnerContainer = styled.div`
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 93vh;
+    margin-right: 1em;
+    margin-left: 1em;
 `;

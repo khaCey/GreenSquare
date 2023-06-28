@@ -70,7 +70,7 @@ const ClockIn = ({ employeeID }) => {
         `${process.env.REACT_APP_API_URL}records`,
         {
           employeeID: employeeID,
-          time: new Date().toUTCString(),
+          time: new Date().toString(),
           type: actionType,
         },
         {

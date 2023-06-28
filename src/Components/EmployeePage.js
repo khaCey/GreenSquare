@@ -3,7 +3,6 @@ import axios from 'axios';
 import { EmployeePageContainer, UpperContainer, PageName, BottomContainer, InnerBottomContainer, EmployeeList, EmployeeCard as EmployeeCardLabel, EmployeeHeader, EmployeeName, EmployeeNumber, EmployeeDays, EmployeeHours, Modal, Overlay } from './StyledComponents'; // import the relevant styled components
 import { EmployeeCard } from './EmployeeCard';
 import { AddEmployeeButton } from './EmployeeAddEmployeeButton';
-import { RecordCard } from './EmployeeRecordCard';
 import { ShiftCard } from './EmployeeShiftCard';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ToastContainer, toast } from 'react-toastify';
